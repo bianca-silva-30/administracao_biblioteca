@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/6.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
+from datetime import timedelta
+
 import os
 from dotenv import load_dotenv
 
@@ -139,3 +141,21 @@ MAILERS = {
 }
 
 CORS_ALLOWED_ORIGINS = ["http://localhost:4200"]
+
+AUTHENTICATION_BACKENDS = ["config.auth_backends.EmailOuMatriculaBackend"]
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",  # para a tela de teste no navegador
+    ],
+    # Toda rota passa a exigir login
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=8),   # um turno de trabalho
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}
