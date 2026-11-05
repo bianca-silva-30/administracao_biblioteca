@@ -5,23 +5,27 @@ from .serializers import (
     LivroSerializer, ExemplarSerializer,
 )
 
+
 class CategoriaViewSet(viewsets.ModelViewSet):
     queryset = Categoria.objects.order_by("nome")
     serializer_class = CategoriaSerializer
+
 
 class EditoraViewSet(viewsets.ModelViewSet):
     queryset = Editora.objects.order_by("nome")
     serializer_class = EditoraSerializer
 
+
 class AutorViewSet(viewsets.ModelViewSet):
     queryset = Autor.objects.order_by("nome")
     serializer_class = AutorSerializer
+
 
 class LivroViewSet(viewsets.ModelViewSet):
     # select_related/prefetch_related evitam consultas repetidas ao banco
     queryset = (
         Livro.objects
-        .selected_related("categoria", "editora")
+        .select_related("categoria", "editora")
         .prefetch_related("autores", "exemplares")
         .order_by("titulo")
     )
@@ -29,7 +33,8 @@ class LivroViewSet(viewsets.ModelViewSet):
 
     # Busca: /api/livros/?search=texto (PBI-9)
     filter_backends = [filters.SearchFilter]
-    search_fields = ["titulos", "isbn", "autores__nome", "categoria__nome",]
+    search_fields = ["titulo", "isbn", "autores__nome", "categoria__nome", ]
+
 
 class ExemplarViewSet(viewsets.ModelViewSet):
     queryset = Exemplar.objects.select_related("livro").order_by("tombo")

@@ -40,27 +40,30 @@ class ExemplarSerializer(serializers.ModelSerializer):
 
 
 class LivroSerializer(serializers.ModelSerializer):
-    categoria_nome = serializers.StringRelatedField(source='categoria', read_only=True)
-    editora_nome = serializers.StringRelatedField(source='editora', read_only=True)
-    autores_nome = serializers.StringRelatedField(source='autores', read_only=True)
+    categoria_nome = serializers.StringRelatedField(source="categoria", read_only=True)
+    editora_nome = serializers.StringRelatedField(source="editora", read_only=True)
+    autores_nomes = serializers.StringRelatedField(source="autores", many=True, read_only=True)
 
     exemplares = ExemplarSerializer(many=True, read_only=True)
 
-    total_exemplars = serializers.SerializerMethodField()
+    total_exemplares = serializers.SerializerMethodField()
     exemplares_disponiveis = serializers.SerializerMethodField()
 
     class Meta:
         model = Livro
         fields = [
-            'id', 'titulo', 'edicao', 'ano', 'isbn', 'ativo',
-            'categoria', 'categoria_nome',
-            'editora', 'editora_nome',
-            'autores', 'autores_nomes',
-            'total_exemplares', 'exemplares_disponiveis', 'exemplares',
+            "id", "titulo", "edicao", "ano", "isbn", "ativo",
+            "categoria", "categoria_nome",
+            "editora", "editora_nome",
+            "autores", "autores_nomes",
+            "total_exemplares", "exemplares_disponiveis", "exemplares",
         ]
 
+    # noinspection PyUnresolvedReferences
     def get_total_exemplares(self, obj):
         return obj.exemplares.count()
 
+    # noinspection PyUnresolvedReferences
     def get_exemplares_disponiveis(self, obj):
         return obj.exemplares.filter(situacao=Exemplar.Situacao.DISPONIVEL).count()
+

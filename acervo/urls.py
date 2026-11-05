@@ -1,6 +1,4 @@
 from rest_framework.routers import DefaultRouter
-
-from config.urls import urlpatterns
 from .views import (
     CategoriaViewSet, EditoraViewSet, AutorViewSet,
     LivroViewSet, ExemplarViewSet,
