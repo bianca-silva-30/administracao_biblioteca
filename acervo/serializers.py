@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.db import transaction
 from .models import Categoria, Editora, Autor, Livro, Exemplar
 
 
@@ -49,13 +50,21 @@ class LivroSerializer(serializers.ModelSerializer):
     total_exemplares = serializers.SerializerMethodField()
     exemplares_disponiveis = serializers.SerializerMethodField()
 
+    # Só para escrita: o front manda nomes e não precisa conhecer ids
+    categoria_texto = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    autor_texto = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    quantidade_exemplares = serializers.IntegerField(
+        write_only=True, required=False, min_value=0, max_value=200
+    )
+
     class Meta:
         model = Livro
         fields = [
             "id", "titulo", "edicao", "ano", "isbn", "ativo",
-            "categoria", "categoria_nome",
+            "categoria", "categoria_nome", "categoria_texto",
             "editora", "editora_nome",
-            "autores", "autores_nomes",
+            "autores", "autores_nomes", "autor_texto",
+            "quantidade_exemplares",
             "total_exemplares", "exemplares_disponiveis", "exemplares",
         ]
 
@@ -73,3 +82,33 @@ class LivroSerializer(serializers.ModelSerializer):
 
     def validate_isbn(self, value):
         return (value or "").strip() or None
+
+    @staticmethod
+    def _obter_ou_criar(modelo, nome):
+        existente = modelo.objects.filter(nome__iexact=nome).first()
+        return existente or modelo.objects.create(nome=nome)
+
+    def _resolver_textos(self, dados):
+        categoria = (dados.pop("categoria_texto", "") or "").strip()
+        autor = (dados.pop("autor_texto", "") or "").strip()
+        if categoria:
+            dados["categoria"] = self._obter_ou_criar(Categoria, categoria)
+        if autor:
+            dados["autores"] = [self._obter_ou_criar(Autor, autor)]
+
+    @transaction.atomic
+    def create(self, validated_data):
+        quantidade = validated_data.pop("quantidade_exemplares", 0)
+        self._resolver_textos(validated_data)
+        livro = super().create(validated_data)
+        Exemplar.objects.bulk_create([
+            Exemplar(livro=livro, tombo=f"LIV{livro.pk:04d}-{n:02d}")
+            for n in range(1, quantidade + 1)
+        ])
+        return livro
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        validated_data.pop("quantidade_exemplares", None)  # exemplares extras: pela rota /api/exemplares/
+        self._resolver_textos(validated_data)
+        return super().update(instance, validated_data)
