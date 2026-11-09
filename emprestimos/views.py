@@ -39,6 +39,8 @@ class EmprestimoViewSet(viewsets.ReadOnlyModelViewSet):
 
         if params.get("usuario"):
             qs = qs.filter(usuario_id=params["usuario"])
+        if params.get("matricula"):
+            qs = qs.filter(usuario__matricula=params["matricula"])
         if params.get("exemplar"):
             qs = qs.filter(exemplar_id=params["exemplar"])
 
