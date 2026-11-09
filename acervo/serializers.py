@@ -59,11 +59,17 @@ class LivroSerializer(serializers.ModelSerializer):
             "total_exemplares", "exemplares_disponiveis", "exemplares",
         ]
 
+    # Usa o prefetch_related da view: contar em Python evita uma consulta por livro
     # noinspection PyUnresolvedReferences
     def get_total_exemplares(self, obj):
-        return obj.exemplares.count()
+        return len(obj.exemplares.all())
 
     # noinspection PyUnresolvedReferences
     def get_exemplares_disponiveis(self, obj):
-        return obj.exemplares.filter(situacao=Exemplar.Situacao.DISPONIVEL).count()
+        return sum(
+            1 for e in obj.exemplares.all()
+            if e.situacao == Exemplar.Situacao.DISPONIVEL
+        )
 
+    def validate_isbn(self, value):
+        return (value or "").strip() or None

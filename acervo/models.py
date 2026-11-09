@@ -39,13 +39,18 @@ class Livro(models.Model):
 
     ativo = models.BooleanField(default=True)
 
+    def save(self, *args, **kwargs):
+        # ISBN vazio vira NULL, senão dois livros sem ISBN ("") violam o unique
+        self.isbn = (self.isbn or "").strip() or None
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.titulo
 
 
 class Exemplar(models.Model):
     class Situacao(models.TextChoices):
-        DISPONIVEL = "disponivel", "Disponìvel"
+        DISPONIVEL = "disponivel", "Disponível"
         EMPRESTADO = "emprestado", "Emprestado"
         PERDIDO = "perdido", "Perdido"
         DANIFICADO = "danificado", "Danificado"

@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('tombo', models.CharField(max_length=30, unique=True)),
                 ('localizacao', models.CharField(blank=True, max_length=100)),
-                ('situacao', models.CharField(choices=[('disponivel', 'Disponìvel'), ('emprestado', 'Emprestado'), ('perdido', 'Perdido'), ('danificado', 'Danificado')], default='disponivel', max_length=20)),
+                ('situacao', models.CharField(choices=[('disponível', 'Disponível'), ('emprestado', 'Emprestado'), ('perdido', 'Perdido'), ('danificado', 'Danificado')], default='disponivel', max_length=20)),
                 ('observacao', models.TextField(blank=True)),
                 ('atualizado_em', models.DateTimeField(auto_now=True)),
                 ('livro', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='exemplares', to='acervo.livro')),
