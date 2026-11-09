@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'acervo',
     'usuarios',
+    'emprestimos',
 ]
 
 MIDDLEWARE = [
@@ -156,4 +157,12 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=8),   # um turno de trabalho
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}
+
+# Regras da biblioteca. VALORES PROVISÓRIOS: confirmar com o bibliotecário.
+BIBLIOTECA = {
+    "PRAZO_EMPRESTIMO_DIAS": {"aluno": 7, "professor": 15, "colaborador": 15},
+    "MAX_EMPRESTIMOS_SIMULTANEOS": {"aluno": 3, "professor": 5, "colaborador": 5},
+    "MAX_RENOVACOES": 2,
+    "BLOQUEAR_COM_ATRASO": True,  # quem tem livro atrasado não pega outro
 }

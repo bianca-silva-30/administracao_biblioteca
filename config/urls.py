@@ -10,4 +10,5 @@ urlpatterns = [
     path("api/auth/eu/", eu),
     path("api/", include("acervo.urls")),
     path("api/", include("usuarios.urls")),
+    path("api/", include("emprestimos.urls")),
 ]
