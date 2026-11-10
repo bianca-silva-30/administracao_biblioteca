@@ -31,3 +31,13 @@ class AcervoAPITests(APITestCase):
             "livro": livro.id, "tombo": "T1", "situacao": "emprestado",
         })
         self.assertEqual(r.status_code, 400)
+
+        def test_cria_livro_com_exemplares_e_nomes(self):
+            r = self.client.post("/api/livros/", {
+                "titulo": "Dom Casmurro", "autor_texto": "Machado de Assis",
+                "categoria_texto": "Literatura", "quantidade_exemplares": 3,
+            })
+            self.assertEqual(r.status_code, 201, r.data)
+            self.assertEqual(r.data["total_exemplares"], 3)
+            self.assertEqual(r.data["autores_nomes"], ["Machado de Assis"])
+            self.assertEqual(r.data["categoria_nome"], "Literatura")
