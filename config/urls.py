@@ -11,4 +11,5 @@ urlpatterns = [
     path("api/", include("acervo.urls")),
     path("api/", include("usuarios.urls")),
     path("api/", include("emprestimos.urls")),
+    path("api/", include("escaneamento.urls")),
 ]
